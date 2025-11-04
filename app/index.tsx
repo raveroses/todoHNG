@@ -209,7 +209,9 @@ export default function Home() {
 
           {/* <Button title="Submit" onPress={handleSubmit} /> */}
         </View>
-
+        <TouchableOpacity onPress={handleAddTodoList}>
+          <Text>Add To do List</Text>
+        </TouchableOpacity>
         <View
           style={[
             isTablet
