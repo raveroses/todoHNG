@@ -73,10 +73,6 @@ export default function Home() {
         isTablet && styles.Body,
         !isTablet && {
           width: "100%",
-          flex: 1,
-          justifyContent: "center",
-          flexDirection: "column",
-          alignItems: "center",
         },
       ]}
     >
@@ -100,11 +96,13 @@ export default function Home() {
             ? styles.content
             : {
                 position: "absolute",
-                top: 120,
-                left: 90,
-                flex: 1,
+                top: "50%",
+                left: "50%",
+                transform: [{ translateX: "-50%" }, { translateY: "-50%" }],
                 flexDirection: "column",
-                width: 400,
+                width: "100%",
+                flex: 1,
+                padding: 10,
               },
         ]}
       >
@@ -258,7 +256,16 @@ export default function Home() {
                   );
                 }}
               />
-              <Text style={{ color: theme.text, flex: 1 }}>{todo.item}</Text>
+              <Text
+                style={{
+                  color: theme.text,
+                  flex: 1,
+                  textDecorationLine:
+                    todo.isCompleted === "completed" ? "line-through" : "none",
+                }}
+              >
+                {todo.item}
+              </Text>
               <TouchableOpacity
                 onPress={() =>
                   setTodos((prev) => prev.filter((_, i) => i !== index))
@@ -286,13 +293,15 @@ export default function Home() {
             >
               5 items Left
             </Text>
-            <Text
-              style={{
-                color: theme.text,
-              }}
-            >
-              Clear Completed
-            </Text>
+            <TouchableOpacity onPress={() => setTodos([])}>
+              <Text
+                style={{
+                  color: theme.text,
+                }}
+              >
+                Clear Completed
+              </Text>
+            </TouchableOpacity>
           </View>
           <View
             style={[
@@ -311,15 +320,17 @@ export default function Home() {
                 color: theme.text,
               }}
             >
-              5 items Left
+              {todos.length} items Left
             </Text>
-            <Text
-              style={{
-                color: theme.text,
-              }}
-            >
-              All
-            </Text>
+            <TouchableOpacity onPress={() => setTodos(todos)}>
+              <Text
+                style={{
+                  color: theme.text,
+                }}
+              >
+                All
+              </Text>
+            </TouchableOpacity>
             <Text
               style={{
                 color: theme.text,
@@ -327,20 +338,31 @@ export default function Home() {
             >
               Active
             </Text>
-            <Text
-              style={{
-                color: theme.text,
+            <TouchableOpacity
+              onPress={() => {
+                const completedItem = todos.filter(
+                  (item) => item.isCompleted === "completed"
+                );
+                setTodos(completedItem);
               }}
             >
-              Completed
-            </Text>
-            <Text
-              style={{
-                color: theme.text,
-              }}
-            >
-              Clear Completed
-            </Text>
+              <Text
+                style={{
+                  color: theme.text,
+                }}
+              >
+                Completed
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => setTodos([])}>
+              <Text
+                style={{
+                  color: theme.text,
+                }}
+              >
+                Clear Completed
+              </Text>
+            </TouchableOpacity>
           </View>
         </View>
       </View>
@@ -352,6 +374,9 @@ const styles = StyleSheet.create({
   Body: {
     width: "100%",
     flex: 1,
+    padding: 0,
+    margin: 0,
+    position: "relative",
   },
   image: {
     width: "100%",
@@ -360,9 +385,9 @@ const styles = StyleSheet.create({
 
   content: {
     position: "absolute",
-    top: 200,
-    left: "35%",
-    flex: 1,
+    top: "50%",
+    left: "50%",
+    transform: [{ translateX: "-50%" }, { translateY: "-50%" }],
     flexDirection: "column",
     width: 540,
   },
