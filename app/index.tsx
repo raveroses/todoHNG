@@ -68,7 +68,18 @@ export default function Home() {
 
   const cancelBtn = () => {};
   return (
-    <View style={[isTablet && styles.Body, !isTablet && { width: "100%" }]}>
+    <View
+      style={[
+        isTablet && styles.Body,
+        !isTablet && {
+          width: "100%",
+          flex: 1,
+          justifyContent: "center",
+          flexDirection: "column",
+          alignItems: "center",
+        },
+      ]}
+    >
       <Image
         source={themeMode === "dark" ? DarkImage : LightImage}
         style={[
