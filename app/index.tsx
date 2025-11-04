@@ -1,6 +1,8 @@
 import { RadioInput } from "@/components/RadioInput";
 import { Colors } from "@/constants/theme";
+import { api } from "@/convex/_generated/api";
 import { Ionicons } from "@expo/vector-icons";
+import { useMutation } from "convex/react";
 import { useState } from "react";
 import {
   Image,
@@ -13,26 +15,20 @@ import {
 } from "react-native";
 import DarkImage from "../assets/images/darkimage.jpg";
 import LightImage from "../assets/images/lightimage.jpg";
-import { api } from "@/convex/_generated/api";
-import { useMutation } from "convex/react";
 
 type ThemeMode = keyof typeof Colors;
 
 type Theme = (typeof Colors)[ThemeMode];
-type Todo= {
-  item:string,
-  isCompleted:string,
- }
+type Todo = {
+  item: string;
+  isCompleted: string;
+};
 export default function Home() {
- const addTodoMutation = useMutation(api.addTodo.addTodo);
+  const addTodoMutation = useMutation(api.addTodo.addTodo);
 
- 
- const [todo,setTodo]= useState<Todo>({
-  item:"",
-  isCompleted:""
- })
-
- console.log(todo)
+  const [todos, setTodos] = useState<Todo[]>([]);
+  const [newTodoText, setNewTodoText] = useState("");
+  const [newTodoCompleted, setNewTodoCompleted] = useState(false);
 
   const { width } = useWindowDimensions();
   const isTablet = width > 800;
@@ -47,47 +43,30 @@ export default function Home() {
   };
 
   console.log("Theme", theme);
-const handleOnChange = (text: string) => {
-  setTodo(prev => ({
-    ...prev,
-    item: text
-  }));
-};
 
-const handleAddTodoList = async () => {
-  if (todo.item.trim()) {
-    await addTodoMutation({
-      item: todo.item,
-      isCompleted: todo.isCompleted
-    });
-    setTodo({ item: "", isCompleted: "" });
-  }
-};
+  const handleAddTodoList = async () => {
+    if (newTodoText.trim()) {
+      await addTodoMutation({
+        item: newTodoText,
+        isCompleted: newTodoCompleted ? "completed" : "",
+      });
 
+      // Add to local list
+      setTodos((prev) => [
+        ...prev,
+        {
+          item: newTodoText,
+          isCompleted: newTodoCompleted ? "completed" : "",
+        },
+      ]);
 
+      // Reset input
+      setNewTodoText("");
+      setNewTodoCompleted(false);
+    }
+  };
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+  const cancelBtn = () => {};
   return (
     <View style={[isTablet && styles.Body, !isTablet && { width: "100%" }]}>
       <Image
@@ -189,13 +168,13 @@ const handleAddTodoList = async () => {
         >
           <RadioInput
             label="completed"
-            selected={todo.isCompleted === "completed"}
-            onPress={() => handleOnChange}
+            selected={newTodoCompleted}
+            onPress={() => setNewTodoCompleted((prev) => !prev)}
           />
           <TextInput
             placeholder="Create a new todo"
-            value={todo.item}
-            onChangeText={handleOnChange}
+            value={newTodoText}
+            onChangeText={setNewTodoText}
             style={[
               {
                 color: theme.text,
@@ -215,7 +194,8 @@ const handleAddTodoList = async () => {
                     outline: "none",
                   },
             ]}
-            // />
+            returnKeyType="done"
+            onSubmitEditing={handleAddTodoList}
           />
 
           {/* <Button title="Submit" onPress={handleSubmit} /> */}
@@ -244,31 +224,39 @@ const handleAddTodoList = async () => {
                 },
           ]}
         >
-          <View
-            style={{
-              flex: 1,
-              flexDirection: "row",
-              gap: 30,
-              borderBottomWidth: 1,
-            }}
-          >
-            <RadioInput
-              label="Option 1"
-              selected={selected === "option1"}
-              onPress={() => setSelected("option1")}
-            />
-
-            <Text
-              style={{
-                color: theme.text,
-              }}
+          {/*  */}
+          {todos.map((todo, index) => (
+            <View
+              key={index}
+              style={{ flexDirection: "row", gap: 10, alignItems: "center" }}
             >
-              Lorem ipsum dolor sit amet consectetur adipisicing elit. Deleniti,
-            </Text>
-            <View>
-              <Ionicons name="close" size={24} style={{ color: theme.text }} />
+              <RadioInput
+                label=""
+                selected={todo.isCompleted === "completed"}
+                onPress={() => {
+                  setTodos((prev) =>
+                    prev.map((t, i) =>
+                      i === index
+                        ? {
+                            ...t,
+                            isCompleted:
+                              t.isCompleted === "completed" ? "" : "completed",
+                          }
+                        : t
+                    )
+                  );
+                }}
+              />
+              <Text style={{ color: theme.text, flex: 1 }}>{todo.item}</Text>
+              <TouchableOpacity
+                onPress={() =>
+                  setTodos((prev) => prev.filter((_, i) => i !== index))
+                }
+              >
+                <Ionicons name="close" size={24} color={theme.text} />
+              </TouchableOpacity>
             </View>
-          </View>
+          ))}
           <View
             style={[
               {

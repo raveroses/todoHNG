@@ -7,7 +7,7 @@ type RadioInputProps = {
   onPress: () => void;
 };
 
-export const RadioInput = ({  selected, onPress }: RadioInputProps) => {
+export const RadioInput = ({ label, selected, onPress }: RadioInputProps) => {
   return (
     <TouchableOpacity onPress={onPress} style={styles.container}>
       <View style={[styles.radioCircle, selected && styles.selectedCircle]} />
